@@ -1,0 +1,7 @@
+environments:
+  dev:
+    environment: dev
+    secretMessage: "This is my dev secret"
+  prod:
+    environment: prod
+    secretMessage: "This is my prod secret"

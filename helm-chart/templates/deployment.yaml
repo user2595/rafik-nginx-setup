@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          # env:
+          # - name: ENVIRONMENT
+          #    value: {{ index .Values.environments .Values.env "environment" | quote }}
+          # - name: SECRET_MESSAGE
+          #   valueFrom:
+          #     secretKeyRef:
+          #       name: site-secret
+          #       key: message
+          volumeMounts:
+          - name: html-volume
+            mountPath: /usr/share/nginx/html/index.html
+            subPath: index.html
+      volumes:
+        - name: html-volume
+          configMap:
+            name: nginx-html
+
+

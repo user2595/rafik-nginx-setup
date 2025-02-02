@@ -1,0 +1,4 @@
+apiVersion: v2
+name: static-site
+description: A simple static site served by Nginx and Traefik
+version: 0.1.0
