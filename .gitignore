@@ -1,0 +1,60 @@
+# General
+.DS_Store
+Thumbs.db
+
+# Kubernetes
+*.kube/config
+.kube/
+*.log
+
+# Minikube
+minikube/
+minikube-* 
+.kube/cache/
+.kube/http-cache/
+
+# Helm
+helm-cache/
+helm-secrets/
+helm-debug.log
+*.tgz  # Helm chart packages
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+crash.log
+override.tf
+override.tf.json
+.terraformrc
+terraform.tfvars
+terraform.tfvars.json
+*.tfplan
+
+# Certificates and Secrets
+certs/
+*.crt
+*.key
+secrets.yaml
+*.pem
+.env
+.envrc
+*.enc
+
+# Temporary files
+*.swp
+*.bak
+*.tmp
+*.swo
+*.pid
+*.sock
+
+# Editor & OS-specific files
+.idea/
+.vscode/
+*.iml
+*.sublime-project
+*.sublime-workspace
+*.log
+*.bak
