@@ -1,7 +1,0 @@
-environments:
-  dev:
-    environment: dev
-    secretMessage: "I debug with print statements and caffeine"
-  prod:
-    environment: prod
-    secretMessage: "It worked only on my machine"

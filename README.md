@@ -51,7 +51,7 @@ Visit `https://localhost` in your browser. Depending on the environment, you sho
 
 ## teste with version ( on 06.02.2025)
 - **Minikube-Version**: v1.35.0
-- **Docker-Version**: 20.10.8
+- **Docker-Version**: 27.4.1
 - **Kubernetes-Version**: v1.21.2
 - **Kubectl-Version**: v1.32.1
 - **Helm-Chart-Version**: 34.2.0

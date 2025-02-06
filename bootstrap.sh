@@ -17,8 +17,8 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 kubectl create secret tls tls-secret --cert=tls.crt --key=tls.key -n dev
 kubectl create secret tls tls-secret --cert=tls.crt --key=tls.key -n prod
 
-helm install static-site ./helm-chart --set env=dev -n dev
-helm install static-site ./helm-chart --set env=prod -n prod
+helm install static-site ./helm-chart  -n dev   -f ./helm-chart/values-dev.yaml
+helm install static-site ./helm-chart  -n prod  -f ./helm-chart/values-prod.yaml
 
 
 # for Debugging
