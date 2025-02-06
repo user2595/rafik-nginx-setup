@@ -1,7 +1,11 @@
+
 # Static Site Deployment with Traefik and Helm
+
+
 
 ## Overview
 This project deploys a static Nginx site behind Traefik Ingress, using Kubernetes and Helm. The site dynamically displays environment-specific messages using Kubernetes Secrets.
+
 
 ## Setup
 1. **Start Minikube and Install Traefik**
@@ -26,20 +30,33 @@ This project deploys a static Nginx site behind Traefik Ingress, using Kubernete
     kubectl rollout restart deployment nginx-deployment -n prod
    ```
 
+5. start the tunnel (termanal must always be open)
+   ```bash
+   minikube tunnel
+   ```
+
 ## Access the Site
 Visit `https://localhost` in your browser. Depending on the environment, you should see:
 
 - **dev:**
   ```
   Hello World!
-  I am on dev. And this is my dev secret.
+  I am on dev. And this is my secret {dev secret}.
   ```
 - **prod:**
   ```
   Hello World!
-  I am on prod. And this is my prod secret.
+  I am on prod. And this is my secret {prod secret}.
   ```
 
+## teste with version ( on 06.02.2025)
+- **Minikube-Version**: v1.35.0
+- **Docker-Version**: 20.10.8
+- **Kubernetes-Version**: v1.21.2
+- **Kubectl-Version**: v1.32.1
+- **Helm-Chart-Version**: 34.2.0
+- **Traefik-Version**: v3.3.2
+- **nginx-Version**: 1.21.0-alpine
 
 
 
@@ -55,7 +72,7 @@ traefik-nginx-setup/
 │       ├── service.yaml
 │       ├── ingress.yaml
 │       ├── secret.yaml
-│       └── configmap.yaml
+│
 │
 ├── bootstrap.sh
 └── README.md
@@ -72,10 +89,10 @@ version: 0.1.0
 environments:
   dev:
     environment: dev
-    secretMessage: "This is my dev secret"
+    secretMessage: "I debug with print statements and caffeine"
   prod:
     environment: prod
-    secretMessage: "This is my prod secret"
+    secretMessage: "It worked only on my machine"
 ```
 # templates/secret.yaml
 ```
@@ -85,14 +102,16 @@ metadata:
   name: site-secret
 type: Opaque
 stringData:
-  message: {{ index .Values.environments .Values.env "secretMessage" }}
+  message: {{ index .Values.environments (.Values.env | default "dev") "secretMessage" }}
 ```
 # templates/deployment.yaml
 ```
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx
+  name: nginx-deployment
+  labels:
+    app: nginx
 spec:
   replicas: 1
   selector:
@@ -104,26 +123,22 @@ spec:
         app: nginx
     spec:
       containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-        env:
-        - name: ENVIRONMENT
-          value: {{ index .Values.environments .Values.env "environment" | quote }}
-        - name: SECRET_MESSAGE
-          valueFrom:
-            secretKeyRef:
-              name: site-secret
-              key: message
-        volumeMounts:
-        - name: nginx-config
-          mountPath: /usr/share/nginx/html/index.html
-          subPath: index.html
-      volumes:
-      - name: nginx-config
-        configMap:
-          name: nginx-config
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          env:
+          - name: ENVIRONMENT
+            value: {{ index .Values.environments (.Values.env | default "dev") "environment" | quote }}
+          - name: SECRET_MESSAGE
+            valueFrom:
+              secretKeyRef:
+                name: site-secret
+                key: message
+          command: ["sh", "-c"]  # Einfache Shell zum Ersetzen der Platzhalter
+          args:
+           - echo "<html><body><h1>Hello World!</h1><p>I am on $ENVIRONMENT. And this is my secret $SECRET_MESSAGE.</p></body></html>" > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'
+
 ```
 # templates/service.yaml
 ```
@@ -144,70 +159,48 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nginx-ingress
-  annotations:
-    kubernetes.io/ingress.class: traefik
+  name: nginx-ingress-test
 spec:
   tls:
-  - hosts:
-    - "localhost"
-    secretName: tls-secret
+    - hosts:
+        - "localhost"
+      secretName: tls-secret
   rules:
-  - host: localhost
-    http:
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: nginx-service
-              port:
-                number: 80
+    - host: localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80
+
 ```
-# templates/configmap.yaml
-```
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nginx-config
-data:
-  index.html: |
-    <html>
-      <head><title>Environment Info</title></head>
-      <body>
-        <h1>Hello World!</h1>
-        <p>I am on {{ index .Values.environments .Values.env "environment" }}. And this is my {{ index .Values.environments .Values.env "secretMessage" }}.</p>
-      </body>
-    </html>
-```
+
 # bootstrap.sh
 ```bash
 #!/bin/bash
 
-# Minikube starten
-minikube start
 
-# Helm-Repo hinzufügen
+minikube start --driver=docker --memory=4g --cpus=2
+
 helm repo add traefik https://helm.traefik.io/traefik
 helm repo update
 
-# Traefik installieren
 helm install traefik traefik/traefik
 
-# Namespaces erstellen
 kubectl create namespace dev
 kubectl create namespace prod
 
-# Selbstsigniertes Zertifikat erstellen
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -out tls.crt -keyout tls.key -subj "/CN=localhost"
 
-# Zertifikate als Secrets hinzufügen
 kubectl create secret tls tls-secret --cert=tls.crt --key=tls.key -n dev
 kubectl create secret tls tls-secret --cert=tls.crt --key=tls.key -n prod
 
-# Minikube Tunnel starten
-minikube tunnel
+helm install static-site ./helm-chart --set env=dev -n dev
+helm install static-site ./helm-chart --set env=prod -n prod
 
 ```
-

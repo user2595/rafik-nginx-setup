@@ -29,5 +29,5 @@ spec:
                 key: message
           command: ["sh", "-c"]  # Einfache Shell zum Ersetzen der Platzhalter
           args:
-           - echo "<html><body><h1>Hello World!</h1><p>I am on $ENVIRONMENT. And this is my secret $SECRET_MESSAGE.</p></body></html>" > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'
+           - echo "<html><body><h1>Hello World!</h1><p>I am on $ENVIRONMENT. And this is my secret! $SECRET_MESSAGE.</p></body></html>" > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'
 
