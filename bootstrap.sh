@@ -21,6 +21,10 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 # Zertifikate als Secrets hinzufügen
 kubectl create secret tls tls-secret --cert=tls.crt --key=tls.key -n dev
 kubectl create secret tls tls-secret --cert=tls.crt --key=tls.key -n prod
+helm install static-site ./helm-chart --set env=dev -n dev
+helm install static-site ./helm-chart --set env=prod -n prod
+kubectl rollout restart deployment nginx-deployment -n dev
+kubectl rollout restart deployment nginx-deployment -n prod
 
 # Minikube Tunnel starten
 minikube tunnel

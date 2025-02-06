@@ -8,6 +8,6 @@ data:
       <head><title>Environment Info</title></head>
       <body>
         <h1>Hello World!</h1>
-    <p>I am on {{ index .Values.environments .Values.env "environment" }}. And this is my {{ index .Values.environments .Values.env "secretMessage" }}.</p>
+    <p>I am on {{ index .Values.environments .Values.env "environment" }}. And this is my secret {{ index .Values.environments .Values.env "secretMessage" }}.</p>
       </body>
     </html>

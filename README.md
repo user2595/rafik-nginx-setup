@@ -19,6 +19,13 @@ This project deploys a static Nginx site behind Traefik Ingress, using Kubernete
    helm install static-site ./helm-chart --set env=prod -n prod
    ```
 
+4. ** for switching between environments**
+   ```bash
+    kubectl rollout restart deployment nginx-deployment -n dev
+    # or
+    kubectl rollout restart deployment nginx-deployment -n prod
+   ```
+
 ## Access the Site
 Visit `https://localhost` in your browser. Depending on the environment, you should see:
 

@@ -1,7 +1,7 @@
 environments:
   dev:
     environment: dev
-    secretMessage: "This is my dev secret"
+    secretMessage: "I debug with print statements and caffeine"
   prod:
     environment: prod
-    secretMessage: "This is my prod secret"
+    secretMessage: "It worked only on my machine"
