@@ -12,27 +12,18 @@ This project deploys a static Nginx site behind Traefik Ingress, using Kubernete
    ```bash
    ./bootstrap.sh
    ```
-
-2. **Deploy for dev environment**
+2. **start the tunnel (termanal must always be open)**
    ```bash
-   helm install static-site ./helm-chart --set env=dev -n dev
+  kubectl port-forward -n dev services/nginx-service 8081:80
+   # or
+  kubectl port-forward -n prod services/nginx-service 8082:80
    ```
-
-3. **Deploy for prod environment**
+3. **Access the Site**
+   - **dev:** Visit `http://localhost:8081` in your browser.
+   - **prod:** Visit `http://localhost:8082` in your browser.
+4. **Clean Up**
    ```bash
-   helm install static-site ./helm-chart --set env=prod -n prod
-   ```
-
-4. ** for switching between environments**
-   ```bash
-    kubectl rollout restart deployment nginx-deployment -n dev
-    # or
-    kubectl rollout restart deployment nginx-deployment -n prod
-   ```
-
-5. start the tunnel (termanal must always be open)
-   ```bash
-   minikube tunnel
+   minikube delete
    ```
 
 ## Access the Site
