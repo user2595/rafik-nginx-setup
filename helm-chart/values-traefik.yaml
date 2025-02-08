@@ -11,18 +11,10 @@ ports:
         to: websecure  # Weiterleitung auf HTTPS aktivieren
 
 # Let's Encrypt Konfiguration für automatische Zertifikate
-certResolvers:
-  letsencrypt:
-    acme:
-      email: "tarik.moussa95@gmail.com"
-      storage: "/data/acme.json"
-      httpChallenge:
-        entryPoint: web
-
-# Aktiviert das Traefik-Dashboard
-ingressRoute:
-  dashboard:
-    enabled: false
+additionalArguments:
+  - "--certificatesresolvers.letsencrypt.acme.email=tarik.moussa95@gmail.com"
+  - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
+  - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
 
 # Aktiviert TLS auf Port 443 mit Let's Encrypt
 ports:
