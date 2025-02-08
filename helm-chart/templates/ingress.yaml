@@ -2,13 +2,17 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nginx-ingress-test
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # Let's Encrypt-Zertifikate holen
+    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"  # HTTPS aktivieren
 spec:
+  ingressClassName: traefik
   tls:
     - hosts:
-        - "localhost"
+        - "kub.eulernest.eu"  # Ersetze localhost durch deine echte Domain!
       secretName: tls-secret
   rules:
-    - host: localhost
+    - host: "kub.eulernest.eu"  # Ersetze localhost mit deiner Domain
       http:
         paths:
           - path: /

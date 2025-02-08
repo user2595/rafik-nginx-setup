@@ -1,0 +1,2 @@
+environment: prod
+secretMessage: "It worked only on my machine"

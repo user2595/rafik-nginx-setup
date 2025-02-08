@@ -1,0 +1,31 @@
+image:
+  repository: traefik
+  tag: v3.3.3
+  pullPolicy: IfNotPresent
+
+# Automatische HTTP → HTTPS Weiterleitung
+ports:
+  web:
+    redirections:
+      entryPoint:
+        to: websecure  # Weiterleitung auf HTTPS aktivieren
+
+# Let's Encrypt Konfiguration für automatische Zertifikate
+certResolvers:
+  letsencrypt:
+    acme:
+      email: "tarik.moussa95@gmail.com"
+      storage: "/data/acme.json"
+      httpChallenge:
+        entryPoint: web
+
+# Aktiviert das Traefik-Dashboard
+ingressRoute:
+  dashboard:
+    enabled: false
+
+# Aktiviert TLS auf Port 443 mit Let's Encrypt
+ports:
+  websecure:
+    tls:
+      certResolver: letsencrypt

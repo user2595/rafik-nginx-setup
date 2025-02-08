@@ -10,6 +10,7 @@ helm install traefik traefik/traefik
 
 kubectl create namespace dev
 kubectl create namespace prod
+kubectl create namespace default
 
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -out tls.crt -keyout tls.key -subj "/CN=localhost"
