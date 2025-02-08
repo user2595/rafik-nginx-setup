@@ -1,2 +1,9 @@
 environment: dev
 secretMessage: "I debug with print statements and coffeine"
+
+installCertManager: true
+
+ingress:
+  enabled: true
+  host: dev.kub.eulernest.eu
+  tlsSecretName: tls-secret-dev

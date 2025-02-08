@@ -58,3 +58,9 @@ secrets.yaml
 *.sublime-workspace
 *.log
 *.bak
+
+# Helm
+*.tgz
+*.prov
+Chart.lock
+charts/
