@@ -10,13 +10,16 @@ ports:
       entryPoint:
         to: websecure  # Weiterleitung auf HTTPS aktivieren
 
-# Let's Encrypt Konfiguration für automatische Zertifikate
+
 additionalArguments:
   - "--certificatesresolvers.letsencrypt.acme.email=tarik.moussa95@gmail.com"
   - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
   - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
 
-# Aktiviert TLS auf Port 443 mit Let's Encrypt
+service:
+  type: LoadBalancer
+  loadBalancerIP: "34.141.90.140"
+   
 ports:
   websecure:
     tls:

@@ -64,3 +64,6 @@ secrets.yaml
 *.prov
 Chart.lock
 charts/
+
+
+terraform/

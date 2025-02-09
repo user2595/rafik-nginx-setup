@@ -1,7 +1,12 @@
 environment: dev
 secretMessage: "I debug with print statements and coffeine"
 
-installCertManager: true
+installCertManager: false
+
+certManager:
+  installCRDs: true
+  email: "tarik.moussa95@gmail.com"
+
 
 ingress:
   enabled: true

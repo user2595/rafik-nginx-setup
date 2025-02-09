@@ -5,8 +5,8 @@ set -o pipefail
 
 PROJECT_ID="k8s-traefik-nginx"
 CLUSTER_NAME="gke-static-site"
-REGION="us-central1"
-ZONE="us-central1-a"
+REGION="europe-west3"
+ZONE="europe-west3-a"
 NODE_POOL_NAME="default-pool"
 EMAIL="tarik.moussa95@gmail.com"
 DOMAIN_DEV="dev.kub.eulernest.eu"
@@ -17,6 +17,7 @@ MACHINE_TYPE="e2-small"
 
 
 echo "🚀 Setting up Google Cloud project..."
+gcloud components install gke-gcloud-auth-plugin -q
 gcloud config set project $PROJECT_ID
 gcloud config set compute/zone $ZONE
 gcloud config set compute/region $REGION
@@ -71,39 +72,42 @@ echo "🔄 Fetching Kubernetes credentials for $CLUSTER_NAME..."
 gcloud container clusters get-credentials $CLUSTER_NAME --region $REGION
 
 echo "🔄 Updating Helm repositories..."
-helm repo add traefik https://helm.traefik.io/traefik
-helm repo add jetstack https://charts.jetstack.io
+helm repo add traefik https://helm.traefik.io/traefik || true
+helm repo add jetstack https://charts.jetstack.io || true
 helm repo update
 
 echo "📦 Installing Traefik as Ingress Controller..."
-helm upgrade --install traefik traefik/traefik -f ./helm-chart/values-traefik.yaml -n traefik --create-namespace
+helm upgrade --install traefik traefik/traefik  -n traefik --create-namespace -f ./traefik/values.yaml
 
 echo "⏳ Waiting for Traefik LoadBalancer..."
-kubectl wait --for=condition=Available deployment traefik -n traefik --timeout=90s
+kubectl wait --for=condition=Available deployment traefik -n traefik --timeout=600s || true
 
 echo "📦 Installing Cert-Manager for Let's Encrypt..."
-helm upgrade --install cert-manager jetstack/cert-manager -n cert-manager --create-namespace -f ./helm-chart/values-cert-manager.yaml
+helm upgrade --install cert-manager jetstack/cert-manager -n cert-manager --create-namespace -f ./cert-manager/values.yaml
 
 echo "🔑 Creating Let's Encrypt ClusterIssuer..."
-kubectl apply -f ./helm-chart/templates/cluster-issuer.yaml
+kubectl apply -f ./cluster-issuer.yaml
 
 echo "⏳ Waiting for Cert-Manager..."
-kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=cert-manager -n cert-manager --timeout=90s
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=cert-manager -n cert-manager --timeout=600s || true
 
 echo "📌 Creating namespaces..."
 kubectl create namespace dev --dry-run=client -o yaml | kubectl apply -f -
 kubectl create namespace prod --dry-run=client -o yaml | kubectl apply -f -
 
 echo "🌍 Deploying Dev environment with its own domain..."
-helm upgrade --install static-site-dev ./helm-chart -n dev --create-namespace -f ./helm-chart/values-dev.yaml
+helm upgrade --install static-site-dev ./static-site -n dev --create-namespace -f ./static-site/values-dev.yaml
 
 echo "🌍 Deploying Prod environment with its own domain..."
-helm upgrade --install static-site-prod ./helm-chart -n prod --create-namespace -f ./helm-chart/values-prod.yaml
+helm upgrade --install static-site-prod ./static-site -n prod --create-namespace -f ./static-site/values-prod.yaml
 
 echo "✅ Setup complete! Test your environments:"
 echo "🔗 Traffic IP: $TRAFFIC_IP"
 echo "🔗 Dev: https://$DOMAIN_DEV"
 echo "🔗 Prod: https://$DOMAIN_PROD"
+
+
+
 
 echo "🚀 Helm Releases:"
 helm list -A
