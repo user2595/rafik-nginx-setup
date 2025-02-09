@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name:  nginx-{{ .Values.environment }}-ingress
   annotations:
+    kubernetes.io/ingress.global-static-ip-name: "ingress-ip"
     cert-manager.io/cluster-issuer: "letsencrypt-prod"  # Let's Encrypt-Zertifikate holen
     traefik.ingress.kubernetes.io/router.entrypoints: "websecure"  # HTTPS aktivieren
     traefik.ingress.kubernetes.io/router.middlewares: "default-redirect-to-https@kubernetescrd"
