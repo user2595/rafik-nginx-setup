@@ -17,19 +17,29 @@ additionalArguments:
   - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
   - "--ping"
 
-livenessProbe:
-  httpGet:
-    path: "/ping"
-    port: 8080
-  initialDelaySeconds: 3
-  periodSeconds: 10
+ping:
+  entryPoint: "ping"
 
-readinessProbe:
-  httpGet:
-    path: "/ping"
-    port: 8080
-  initialDelaySeconds: 3
-  periodSeconds: 5
+ports:
+  ping:
+    port: 8082
+    expose: true
+    exposedPort: 8082
+
+healthcheck:
+  livenessProbe:
+    httpGet:
+      path: "/ping"
+      port: 8082
+    initialDelaySeconds: 3
+    periodSeconds: 10
+
+  readinessProbe:
+    httpGet:
+      path: "/ping"
+      port: 8082
+    initialDelaySeconds: 3
+    periodSeconds: 5
 
 service:
   type: LoadBalancer
