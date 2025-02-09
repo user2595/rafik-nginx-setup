@@ -15,11 +15,26 @@ additionalArguments:
   - "--certificatesresolvers.letsencrypt.acme.email=tarik.moussa95@gmail.com"
   - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
   - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+  - "--ping"
+
+livenessProbe:
+  httpGet:
+    path: "/ping"
+    port: 8080
+  initialDelaySeconds: 3
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: "/ping"
+    port: 8080
+  initialDelaySeconds: 3
+  periodSeconds: 5
 
 service:
   type: LoadBalancer
   loadBalancerIP: "34.141.90.140"
-   
+
 ports:
   websecure:
     tls:

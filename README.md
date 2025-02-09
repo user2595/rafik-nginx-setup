@@ -44,23 +44,39 @@ Visit `https://dev.domain` or  `https://prod.domain` in your browser. Depending 
 ```
 traefik-nginx-setup/
 │
-├── helm-chart/
+├── static-site/
 │   ├── Chart.yaml
 │   ├── values-dev.yaml
 │   ├── values-prod.yaml
-│   ├── values-traefik.yaml
-│   ├── values-cert-manager.yaml
 │   └── templates/
 │       ├── deployment.yaml
 │       ├── service.yaml
 │       ├── ingress.yaml
 │       ├── secret.yaml
-│       ├── cluster-issuer.yaml
 │       └── _helpers.tpl
-│
+│── traefik/
+│   ├── values.yaml
+│── cert-manager/
+│   ├── values.yaml
+|   |── cluster-issuer.yaml
 │
 ├── bootstrap.sh
 └── README.md
 ```
+## Health Checks Overview
+
+This GKE setup includes multiple health checks to ensure system stability and availability:
+
+1. Kubernetes Probes
+	•	Liveness Probe → Restarts pods if unresponsive.
+	•	Readiness Probe → Ensures pods only receive traffic when ready.
+
+2. GKE LoadBalancer Health Check
+	•	Monitors Traefik and removes unhealthy instances from the LoadBalancer.
+
+3️. Google Cloud Uptime Check
+	•	Monitors external availability of Dev & Prod environments.
+	•	Sends alerts if services become unreachable.
+
 
 ```

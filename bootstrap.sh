@@ -1,8 +1,5 @@
 #!/bin/bash
 
-set -e  
-set -o pipefail  
-
 PROJECT_ID="k8s-traefik-nginx"
 CLUSTER_NAME="gke-static-site"
 REGION="europe-west3"
@@ -14,6 +11,59 @@ DOMAIN_PROD="prod.kub.eulernest.eu"
 NUMBER_OF_NODES=3
 DISK_SIZE_OF_NODES=20
 MACHINE_TYPE="e2-small"
+
+
+create_uptime_check() {
+  local SERVICE_NAME=$1
+  local URL=$2
+
+  echo "🔍 Erstelle Google Cloud Uptime Check für $SERVICE_NAME ($URL)..."
+
+  gcloud monitoring uptime-checks create http $SERVICE_NAME-uptime-check \
+    --display-name="$SERVICE_NAME Uptime Check" \
+    --http-check-path="/" \
+    --http-check-port=443 \
+    --http-check-use-ssl \
+    --resource-type="uptime_url" \
+    --project=$PROJECT_ID \
+    --monitored-resource-labels=project_id=$PROJECT_ID,url=$URL
+
+  echo "✅ Uptime Check für $SERVICE_NAME erstellt!"
+}
+
+check_cert_status() {
+  local CERT_NAME=$1
+  local NAMESPACE=$2
+
+  STATUS=$(kubectl get certificate -n $NAMESPACE $CERT_NAME -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
+
+  if [ "$STATUS" == "True" ]; then
+    echo "✅ Zertifikat $CERT_NAME ist gültig!"
+  else
+    echo "❌ WARNUNG: Zertifikat $CERT_NAME ist NICHT bereit!"
+  fi
+}
+
+check_clusterissuer_status() {
+  local ISSUER_NAME=$1
+
+  STATUS=$(kubectl get clusterissuer $ISSUER_NAME -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
+
+  if [ "$STATUS" == "True" ]; then
+    echo "✅ ClusterIssuer $ISSUER_NAME ist bereit!"
+  else
+    echo "❌ WARNUNG: ClusterIssuer $ISSUER_NAME ist NICHT bereit!"
+    echo "🔍 Überprüfe die Logs mit: kubectl describe clusterissuer $ISSUER_NAME"
+  fi
+}
+
+
+
+
+set -e
+set -o pipefail
+
+
 
 
 echo "🚀 Setting up Google Cloud project..."
@@ -107,7 +157,39 @@ echo "🔗 Dev: https://$DOMAIN_DEV"
 echo "🔗 Prod: https://$DOMAIN_PROD"
 
 
-
-
 echo "🚀 Helm Releases:"
 helm list -A
+
+
+# health check
+echo "🔗 Creating health check for Traefik LoadBalancer..."
+gcloud compute health-checks create http traefik-health-check \
+    --port 80 \
+    --request-path "/" \
+    --check-interval 10s \
+    --timeout 3s
+
+
+echo "🔗 Creating backend service for Traefik LoadBalancer..."
+gcloud compute backend-services create traefik-backend \
+    --protocol HTTP \
+    --global \
+    --port-name http \
+    --load-balancing-scheme EXTERNAL \
+    --health-checks traefik-health-check
+
+
+echo "🔗 Adding backend service to URL map..."
+create_uptime_check "dev" "https://$DOMAIN_DEV"
+create_uptime_check "prod" "https://$DOMAIN_PROD"
+
+echo "🔗 Creating URL map for Traefik LoadBalancer..."
+check_cert_status "tls-secret-dev" "dev"
+check_cert_status "tls-secret-prod" "prod"
+
+check_clusterissuer_status "letsencrypt-prod"
+echo "🔗 Creating e-mail notification"
+gcloud monitoring notification-channels create-email \
+  --display-name="Uptime Alert" \
+  --email-address="$EMAIL" \
+
