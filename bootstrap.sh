@@ -16,11 +16,7 @@ DISK_SIZE_OF_NODES=20
 MACHINE_TYPE="e2-small"
 
 
-echo "🚀 Setting up Google Cloud project..."
-gcloud components install gke-gcloud-auth-plugin -q
-gcloud config set project $PROJECT_ID
-gcloud config set compute/zone $ZONE
-gcloud config set compute/region $REGION
+
 
 # startic ip
 echo "🚀 Creating static IP for Traefik LoadBalancer..."
@@ -44,9 +40,7 @@ gcloud config set project $PROJECT_ID
 
 
 echo "📌 Creating GKE cluster (if not already present)..."
-
-
-if ! gcloud container clusters describe $CLUSTER_NAME --zone $ZONE &> /dev/null; then
+if ! gcloud container clusters describe $CLUSTER_NAME --region $REGION &> /dev/null; then
   echo "⏳ Cluster does not exist, creating..."
   gcloud container clusters create-auto $CLUSTER_NAME --region $REGION
   # gcloud container clusters create $CLUSTER_NAME \
@@ -77,7 +71,7 @@ helm repo add jetstack https://charts.jetstack.io || true
 helm repo update
 
 echo "📦 Installing Traefik as Ingress Controller..."
-helm upgrade --install traefik traefik/traefik  -n traefik --create-namespace -f ./traefik/values.yaml
+helm upgrade --install traefik traefik/traefik  -n traefik --create-namespace -f ./traefik/values.yaml  --set service.spec.loadBalancerIP=$TRAFFIC_IP
 
 echo "⏳ Waiting for Traefik LoadBalancer..."
 kubectl wait --for=condition=Available deployment traefik -n traefik --timeout=600s || true
@@ -86,7 +80,7 @@ echo "📦 Installing Cert-Manager for Let's Encrypt..."
 helm upgrade --install cert-manager jetstack/cert-manager -n cert-manager --create-namespace -f ./cert-manager/values.yaml
 
 echo "🔑 Creating Let's Encrypt ClusterIssuer..."
-kubectl apply -f ./cluster-issuer.yaml
+kubectl apply -f ./cert-manager/cluster-issuer.yaml
 
 echo "⏳ Waiting for Cert-Manager..."
 kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=cert-manager -n cert-manager --timeout=600s || true

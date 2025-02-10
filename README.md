@@ -44,23 +44,23 @@ Visit `https://dev.domain` or  `https://prod.domain` in your browser. Depending 
 ```
 traefik-nginx-setup/
 │
-├── helm-chart/
+├── static-site/
 │   ├── Chart.yaml
 │   ├── values-dev.yaml
 │   ├── values-prod.yaml
-│   ├── values-traefik.yaml
-│   ├── values-cert-manager.yaml
 │   └── templates/
 │       ├── deployment.yaml
 │       ├── service.yaml
 │       ├── ingress.yaml
 │       ├── secret.yaml
-│       ├── cluster-issuer.yaml
 │       └── _helpers.tpl
-│
+│── traefik/
+│   ├── values.yaml
+│── cert-manager/
+│   ├── values.yaml
+|   |── cluster-issuer.yaml
 │
 ├── bootstrap.sh
 └── README.md
 ```
 
-```

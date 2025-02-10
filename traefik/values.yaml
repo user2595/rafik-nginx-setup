@@ -16,10 +16,7 @@ additionalArguments:
   - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
   - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
 
-service:
-  type: LoadBalancer
-  loadBalancerIP: "34.141.90.140"
-   
+
 ports:
   websecure:
     tls:

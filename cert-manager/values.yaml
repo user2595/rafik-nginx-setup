@@ -1,6 +1,6 @@
-installCRDs: true
 
-
+crds:
+  enabled: true
 
 replicaCount: 1
 
