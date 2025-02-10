@@ -96,7 +96,7 @@ gcloud config set project $PROJECT_ID
 echo "📌 Creating GKE cluster (if not already present)..."
 
 
-if ! gcloud container clusters describe $CLUSTER_NAME --zone $ZONE &> /dev/null; then
+if ! gcloud container clusters describe $CLUSTER_NAME --zone $ZONE ; then
   echo "⏳ Cluster does not exist, creating..."
   gcloud container clusters create-auto $CLUSTER_NAME --region $REGION
   # gcloud container clusters create $CLUSTER_NAME \
