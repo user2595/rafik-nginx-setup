@@ -3,11 +3,6 @@ secretMessage: "I debug with print statements and coffeine"
 
 installCertManager: false
 
-certManager:
-  installCRDs: true
-  email: "tarik.moussa95@gmail.com"
-
-
 ingress:
   enabled: true
   host: dev.kub.eulernest.eu

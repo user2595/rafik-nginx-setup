@@ -49,12 +49,7 @@ if ! gcloud container clusters describe $CLUSTER_NAME --region $REGION &> /dev/n
   #   --enable-autoscaling --min-nodes=1 --max-nodes=$NUMBER_OF_NODES \
   #   --disk-size=$DISK_SIZE_OF_NODES \
   #   --machine-type=$MACHINE_TYPE \
-  #   --enable-ip-alias \
   #   --disk-type=pd-balanced \
-  #   --release-channel=regular \
-  #   --enable-autoupgrade \
-  #   --enable-autorepair \
-  #   --spot
   echo "✅ Cluster created!  🚀"
 else
   echo "✅ Cluster already exists!"

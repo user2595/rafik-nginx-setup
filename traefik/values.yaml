@@ -3,12 +3,12 @@ image:
   tag: v3.3.3
   pullPolicy: IfNotPresent
 
-# Automatische HTTP → HTTPS Weiterleitung
+
 ports:
   web:
     redirections:
       entryPoint:
-        to: websecure  # Weiterleitung auf HTTPS aktivieren
+        to: websecure  
 
 
 additionalArguments:

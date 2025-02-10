@@ -3,10 +3,6 @@ secretMessage: "It worked only on my machine"
 
 installCertManager: false
 
-certManager:
-  installCRDs: true
-  email: "tarik.moussa95@gmail.com"
-
 ingress:
   enabled: true
   host: prod.kub.eulernest.eu
