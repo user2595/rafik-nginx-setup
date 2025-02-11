@@ -30,8 +30,6 @@ Visit `https://dev.domain` or  `https://prod.domain` in your browser. Depending 
 -
 - **gcloud-Version**: 358.0.0
 - **gke-Version**: 1.21.2-gke.1300
-- **Minikube-Version**: v1.35.0
-- **Docker-Version**: 27.4.1
 - **Kubernetes-Version**: v1.21.2
 - **Kubectl-Version**: v1.32.1
 - **Helm-Chart-Version**: 34.2.0

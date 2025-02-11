@@ -27,7 +27,7 @@ spec:
               secretKeyRef:
                 name: site-secret
                 key: message
-          command: ["sh", "-c"]  # Einfache Shell zum Ersetzen der Platzhalter
+          command: ["sh", "-c"] 
           args:
            - echo "<html><body><h1>Hello World!</h1><h2>I am on $ENVIRONMENT  and this is my secret! </h2> <h3>$SECRET_MESSAGE.</h3></body></html>" > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'
 

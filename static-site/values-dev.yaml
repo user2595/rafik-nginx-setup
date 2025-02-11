@@ -1,8 +1,6 @@
 environment: dev
 secretMessage: "I debug with print statements and coffeine"
 
-installCertManager: false
-
 ingress:
   enabled: true
   host: dev.kub.eulernest.eu

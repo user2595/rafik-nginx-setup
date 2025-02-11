@@ -15,10 +15,6 @@ NUMBER_OF_NODES=3
 DISK_SIZE_OF_NODES=20
 MACHINE_TYPE="e2-small"
 
-
-
-
-# startic ip
 echo "🚀 Creating static IP for Traefik LoadBalancer..."
 if ! gcloud compute addresses describe ingress-ip --region $REGION &> /dev/null; then
   gcloud compute addresses create ingress-ip --region $REGION --project $PROJECT_ID
@@ -27,7 +23,6 @@ else
   echo "✅ Static IP already exists!"
 fi
 
-# get static ip
 TRAFFIC_IP=$(gcloud compute addresses describe ingress-ip --region $REGION --format='value(address)')
 echo "✅ Static IP: $TRAFFIC_IP"
 echo "🚀 Enabling Google Cloud APIs..."
@@ -36,20 +31,16 @@ gcloud services enable container.googleapis.com artifactregistry.googleapis.com
 echo "🔧 Setting Google Cloud project..."
 gcloud config set project $PROJECT_ID
 
-
-
-
 echo "📌 Creating GKE cluster (if not already present)..."
 if ! gcloud container clusters describe $CLUSTER_NAME --region $REGION &> /dev/null; then
   echo "⏳ Cluster does not exist, creating..."
-  gcloud container clusters create-auto $CLUSTER_NAME --region $REGION
-  # gcloud container clusters create $CLUSTER_NAME \
-  #   --zone $ZONE \
-  #   --num-nodes=1 \
-  #   --enable-autoscaling --min-nodes=1 --max-nodes=$NUMBER_OF_NODES \
-  #   --disk-size=$DISK_SIZE_OF_NODES \
-  #   --machine-type=$MACHINE_TYPE \
-  #   --disk-type=pd-balanced \
+    gcloud container clusters create $CLUSTER_NAME \
+    --region $REGION
+    --num-nodes=1 \
+    --enable-autoscaling --min-nodes=1 --max-nodes=$NUMBER_OF_NODES \
+    --disk-size=$DISK_SIZE_OF_NODES \
+    --machine-type=$MACHINE_TYPE \
+    --disk-type=pd-balanced \
   echo "✅ Cluster created!  🚀"
 else
   echo "✅ Cluster already exists!"
@@ -94,8 +85,6 @@ echo "✅ Setup complete! Test your environments:"
 echo "🔗 Traffic IP: $TRAFFIC_IP"
 echo "🔗 Dev: https://$DOMAIN_DEV"
 echo "🔗 Prod: https://$DOMAIN_PROD"
-
-
 
 
 echo "🚀 Helm Releases:"
