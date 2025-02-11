@@ -19,8 +19,6 @@ echo "🚀 Creating static IP for Traefik LoadBalancer..."
 if ! gcloud compute addresses describe ingress-ip --region $REGION &> /dev/null; then
   gcloud compute addresses create ingress-ip --region $REGION --project $PROJECT_ID
   echo "⏳ Static IP does not exist, creating..."
-else
-  echo "✅ Static IP already exists!"
 fi
 
 TRAFFIC_IP=$(gcloud compute addresses describe ingress-ip --region $REGION --format='value(address)')
@@ -34,19 +32,11 @@ gcloud config set project $PROJECT_ID
 echo "📌 Creating GKE cluster (if not already present)..."
 if ! gcloud container clusters describe $CLUSTER_NAME --region $REGION &> /dev/null; then
   echo "⏳ Cluster does not exist, creating..."
-    gcloud container clusters create $CLUSTER_NAME \
-    --region $REGION
-    --num-nodes=1 \
-    --enable-autoscaling --min-nodes=1 --max-nodes=$NUMBER_OF_NODES \
-    --disk-size=$DISK_SIZE_OF_NODES \
-    --machine-type=$MACHINE_TYPE \
-    --disk-type=pd-balanced \
+   gcloud container clusters create-auto $CLUSTER_NAME --region $REGION
   echo "✅ Cluster created!  🚀"
 else
   echo "✅ Cluster already exists!"
 fi
-
-
 
 echo "🔄 Fetching Kubernetes credentials for $CLUSTER_NAME..."
 gcloud container clusters get-credentials $CLUSTER_NAME --region $REGION
